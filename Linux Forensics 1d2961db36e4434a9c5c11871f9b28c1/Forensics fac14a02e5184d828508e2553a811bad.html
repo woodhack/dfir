@@ -1,0 +1,684 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Forensics</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+    margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 237, 214, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 237, 214, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: rgba(35, 131, 226, .07); }
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-transparentGray { background-color: rgba(227, 226, 224, 0); }
+.select-value-color-translucentGray { background-color: rgba(0, 0, 0, 0.06); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(249, 228, 188, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="fac14a02-e518-4d82-8508-e2553a811bad" class="page sans"><header><h1 class="page-title">Forensics</h1><p class="page-description"></p></header><div class="page-body"><nav id="e25c314f-285d-4451-85a3-2465fa907753" class="block-color-gray table_of_contents"><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#1be4a7b0-8127-48d5-9d16-708d1016f836">OS</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#589f51d3-efc7-433e-8908-49a29fe9ac94">Users</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#9bf14bca-6917-4bb8-bad4-542357645c3c">Groups</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#d4514593-b526-422d-b97b-6db60057b5ac">Sudoers list - Privileges for sudo</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#23fe13c2-cb29-4b13-9b78-38fafcb552a2">Login Info</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#308244b3-b4bd-438d-b15b-8472fd1a0ca2">Authentication Logs</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#8f3408b9-e278-4c4e-a5b6-6a3746d59d20">Hostname</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#178dbd62-1662-441f-825a-cab05640eaf6">Timezone</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#81c62373-f88a-4a3b-b6ff-bd3adf39165d">Network Configuration</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#f43c1933-fd72-4cd5-8c82-d2d7e69a7e63">Active Network Connections</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#f7b209b5-641e-452d-9cdd-7e269f998ede">Running Processes</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#9e4b09ac-d284-4c15-8a02-953b8194948d">DNS Information</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#1b721b33-5fba-45a5-a5ba-0d300572c83f">Persistence</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#ea998896-48b9-487a-8402-dc35f6cef219">Cron Jobs</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#09ee0e13-148f-4600-8ace-b672f0d14c81">Service Startup</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#e3dc57c8-3647-4606-935f-606fc250edf8">.Bashrc</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#2c4d3d1e-7945-43da-9895-edac51022ea2">Evidence of Execution</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#f96b4319-3289-45eb-a7ea-2a1d8b461517">Sudo Execution History</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#df980f06-8419-44b4-8f77-82bf8ef8b0c3">Bash History</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#099f9073-a960-45e6-8032-435133b6f775">Files Accessed Using Vim</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#2f6ef4f4-b7f1-4df3-9f36-884d14b0c040">Logs</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#51db8bcc-61c7-4d92-bb7f-af99a9330a7c">Syslog</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#328ee00d-a618-412b-96a2-0cec47e7d297">Auth Logs</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#77a0c259-3898-4c07-97ef-7744f99765d0">Third-Party Logs</a></div></nav><h2 id="1be4a7b0-8127-48d5-9d16-708d1016f836" class="">OS</h2><p id="c3eaa60b-bbb0-4fa5-8fdd-f8ce4bbdce83" class="">To retrieve information about the operating system release, the cat utility can be used to read the file located at /etc/os-release, which contains details about the system&#x27;s version and distribution.</p><p id="2ebbce84-885f-4bca-9a26-b0366062834e" class=""><code>cat /etc/os-release</code></p><h2 id="589f51d3-efc7-433e-8908-49a29fe9ac94" class="">Users</h2><p id="ff9b2fc9-0787-496c-9c4d-bf800de9f901" class="">The /etc/passwd file holds essential information about user accounts on a Linux system. It is a plain-text file that contains 7 colon-separated fields: username, password placeholder, user ID (UID), group ID (GID), user description (often full name), the home directory, and the shell that is invoked at login. The cat utility can be used to display this information in a more readable format.</p><p id="b6d0bdae-58ba-4505-aa82-6a73e68d5f5f" class=""><code>cat /etc/passwd | column -t -s :</code></p><h2 id="9bf14bca-6917-4bb8-bad4-542357645c3c" class="">Groups</h2><p id="3fd35dd1-9925-4713-8ac0-22e3577c71da" class="">The /etc/group file contains details about the various user groups on the system. Each group has its name, group password (usually not set), GID, and a list of users who belong to the group. This file can be read using:</p><p id="a24af0a7-f7a1-459a-a331-aaf5d28abfdd" class=""><code>cat /etc/group</code></p><h2 id="d4514593-b526-422d-b97b-6db60057b5ac" class="">Sudoers list - Privileges for sudo</h2><p id="71a91787-2157-40c7-ad94-aa91c526d468" class="">To determine which users have the ability to elevate privileges via sudo, you can inspect the /etc/sudoers file. This file defines the users and groups allowed to perform administrative tasks with sudo. Accessing it requires elevated privileges:</p><p id="7bfd2040-a100-48e1-8fec-18c6ba1b1709" class=""><code>sudo cat /etc/sudoers</code></p><h2 id="23fe13c2-cb29-4b13-9b78-38fafcb552a2" class="">Login Info</h2><p id="2914dace-f30b-4675-a8b3-7f5f6a74a6b9" class="">Login records are stored in the /var/log directory. wtmp contains a history of logins and reboots, while btmp logs failed login attempts. These binary files can be read using the last utility to view login attempts.</p><p id="fd8c0fb4-b6aa-4cbb-b4f3-cf12d79937e9" class=""><code>sudo last -f /var/log/wtmp</code></p><h2 id="308244b3-b4bd-438d-b15b-8472fd1a0ca2" class="">Authentication Logs</h2><p id="00cefb33-683c-4453-a49a-866ffc977e00" class="">User authentication events are logged in the /var/log/auth.log file, which logs successful and failed authentication attempts, as well as sudo usage.</p><p id="514dc4f5-3f64-4acb-9aef-d34a83b2491a" class=""><code>cat /var/log/auth.log | tail</code></p><h2 id="8f3408b9-e278-4c4e-a5b6-6a3746d59d20" class="">Hostname</h2><p id="dd64bae2-6b49-4d97-9b57-48c5338c5765" class="">The system hostname, which identifies the machine on the network, is stored in the /etc/hostname file.</p><p id="5740ef28-3266-4e56-af6a-6be0254cc7ab" class=""><code>cat /etc/hostname</code></p><h2 id="178dbd62-1662-441f-825a-cab05640eaf6" class="">Timezone</h2><p id="ca3f56ba-5525-46e8-b56d-154cec11a6ef" class="">The system&#x27;s timezone configuration is stored in the /etc/timezone file. It can be read to determine the current timezone settings of the system.</p><p id="9208663c-3caa-447a-9804-f5ed4b6d4834" class=""><code>cat /etc/timezone</code></p><h2 id="81c62373-f88a-4a3b-b6ff-bd3adf39165d" class="">Network Configuration</h2><p id="e4b19f0f-d528-47d6-a827-5300868425ca" class="">Network interfaces and configurations are defined in /etc/network/interfaces. This file can provide insight into the system’s network setup, including IP addresses, DNS servers, and routes.</p><p id="3c8584dd-95b4-4e2b-a305-75d7baeda8ad" class=""><code>cat /etc/network/interfaces</code></p><p id="8e9d6954-1136-4357-9de4-7d627a4dcd1d" class="">For live network information, the ip command provides details on the system’s network interfaces and IP addresses.</p><p id="223ea48f-2457-43f2-8899-107478b0aa98" class=""><code>ip address show</code></p><h2 id="f43c1933-fd72-4cd5-8c82-d2d7e69a7e63" class="">Active Network Connections</h2><p id="fec5eb50-de3b-4987-80e7-53896b25b720" class="">Monitoring active network connections is vital in live forensics. The netstat utility displays active network connections, listening ports, and the corresponding processes.</p><p id="a83c3ea5-7182-4ec3-840b-3fa964d57ff5" class=""><code>netstat -natp</code></p><h2 id="f7b209b5-641e-452d-9cdd-7e269f998ede" class="">Running Processes</h2><p id="cfdbd356-9357-4f7f-b648-8bad8241ea49" class="">On a live system, it is critical to examine the running processes to understand what is actively occurring on the machine. The ps utility provides details on running processes, including their owner, CPU usage, and command used to launch them.</p><p id="dc661860-23fe-416d-a921-397299c3d555" class=""><code>ps aux</code></p><h2 id="9e4b09ac-d284-4c15-8a02-953b8194948d" class="">DNS Information</h2><p id="5f18d465-dc4d-41ac-a556-417ecf8fc913" class="">The /etc/hosts file maps hostnames to IP addresses locally on the machine. This file can be examined for static DNS configurations.</p><p id="af15d6d9-1b21-44e2-b0d9-09774f8781a5" class=""><code>cat /etc/hosts</code></p><p id="f2f4408d-6c03-49b1-976f-d79828193fd1" class="">Information about DNS servers used by the system for name resolution is stored in /etc/resolv.conf.</p><p id="b5d785a4-d7a0-4bdd-adf0-4c3b92ca7ace" class=""><code>cat /etc/resolv.conf</code></p><h2 id="1b721b33-5fba-45a5-a5ba-0d300572c83f" class="">Persistence</h2><h3 id="ea998896-48b9-487a-8402-dc35f6cef219" class="">Cron Jobs</h3><p id="616d2c41-bb0d-4ed1-8558-02e6d43cab65" class="">Cron jobs are automated tasks that run at scheduled intervals. The system-wide cron jobs are defined in /etc/crontab, making it an important file to check for any persistent tasks that might have been set by an attacker.</p><p id="7e328ec2-e062-4386-bf45-76bfa02ea41a" class=""><code>cat /etc/crontab</code></p><h3 id="09ee0e13-148f-4600-8ace-b672f0d14c81" class="">Service Startup</h3><p id="2647abf3-2b56-4487-9618-cc11ae69a2d2" class="">Linux services that start automatically at boot are usually managed by scripts in the /etc/init.d directory. These services can persist across reboots, making them a potential target for attackers looking to maintain access.</p><p id="688c575c-1830-4916-af15-66569eb1babb" class=""><code>ls /etc/init.d/</code></p><h3 id="e3dc57c8-3647-4606-935f-606fc250edf8" class="">.Bashrc</h3><p id="ea54d781-f912-4737-8044-88bce562471c" class="">The .bashrc file contains shell configuration commands that run whenever a new terminal session is started. It can be a potential location for persistence mechanisms set by attackers.</p><p id="a7f0d5c0-cdb5-4b5a-90a8-4a417bc873ab" class=""><code>cat ~/.bashrc</code></p><h2 id="2c4d3d1e-7945-43da-9895-edac51022ea2" class="">Evidence of Execution</h2><h3 id="f96b4319-3289-45eb-a7ea-2a1d8b461517" class="">Sudo Execution History</h3><p id="948354bb-77fe-49d7-8ea0-7aec0ed16554" class="">Commands executed using sudo are logged in the authentication log file. This can provide a detailed history of administrative commands run on the system.</p><p id="b7b6781e-2854-4750-869b-f23aa092696d" class=""><code>cat /var/log/auth.log* | grep -i COMMAND | tail</code></p><h3 id="df980f06-8419-44b4-8f77-82bf8ef8b0c3" class="">Bash History</h3><p id="51fe68f1-0b98-4a98-92fb-aa4350336dea" class="">Each user’s command history is stored in their ~/.bash_history file, which logs commands that are run outside of sudo. It is essential to check all users&#x27; .bash_history files, including root.</p><p id="6c1a765d-34b1-4cf4-b5fa-5343fde641b3" class=""><code>cat ~/.bash_history </code></p><p id="f725fad1-b981-44c9-bf2c-866ae3a3ce59" class=""><code>sudo cat /home/{USERNAME}/.bash_history</code></p><h3 id="099f9073-a960-45e6-8032-435133b6f775" class="">Files Accessed Using Vim</h3><p id="ae1d7a72-ea1e-448f-ab40-dd5ea6aa8039" class="">The Vim text editor logs opened files in .viminfo. This file contains a record of files that have been opened and manipulated, as well as search history and other command information, providing potential evidence of file access.</p><p id="e57f4aa7-ba57-4087-a952-24d7547b3e4c" class=""><code>cat ~/.viminfo</code></p><h2 id="2f6ef4f4-b7f1-4df3-9f36-884d14b0c040" class="">Logs</h2><h3 id="51db8bcc-61c7-4d92-bb7f-af99a9330a7c" class="">Syslog</h3><p id="460ac0d6-b762-4fca-8035-9ffeb147bb15" class="">The syslog is a critical system log that captures general messages and errors generated by the kernel and other system components. It can be a valuable source of information for understanding system activity and potential issues.</p><p id="dc22ea5a-4453-41af-9eca-4734755a3bde" class=""><code>cat /var/log/syslog* | head</code></p><h3 id="328ee00d-a618-412b-96a2-0cec47e7d297" class="">Auth Logs</h3><p id="bff839e6-c2c6-47bb-af1a-53007165b3c9" class="">Authentication logs contain information related to user logins, sudo access, and other security-related events. It is essential for tracking suspicious authentication attempts.</p><p id="55043800-310a-4eb1-aeae-e4473fbf0219" class=""><code>cat /var/log/auth.log* | head</code></p><h3 id="77a0c259-3898-4c07-97ef-7744f99765d0" class="">Third-Party Logs</h3><p id="44c0aece-c557-4c5a-aa7f-39f3ba4362b3" class="">Logs for third-party applications, such as web servers, databases, and file-sharing services, are typically stored in /var/log/. Checking these directories can reveal activity from non-native software.</p><p id="769e9fe8-ad69-4bb9-9dd9-f4b3fa3584ef" class=""><code>ls /var/log ls /var/log/apache2/</code></p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

@@ -1,0 +1,695 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>NMAP</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+    margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 237, 214, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 237, 214, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: rgba(35, 131, 226, .07); }
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-transparentGray { background-color: rgba(227, 226, 224, 0); }
+.select-value-color-translucentGray { background-color: rgba(0, 0, 0, 0.06); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(249, 228, 188, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="1afdddd0-43f3-4df2-8e47-e0ca42ec98fa" class="page sans"><header><h1 class="page-title">NMAP</h1><p class="page-description"></p></header><div class="page-body"><p id="143c2120-cd59-499d-b355-4feafe660e3a" class="">Nmap (Network Mapper) is a powerful open-source tool for network discovery and security auditing. It helps identify hosts, services, open ports, and vulnerabilities by sending packets to targets and analyzing their responses.</p><p id="b7bed54a-8bd2-4125-bdc0-e36916d3e970" class="">
+</p><p id="b6f91ca2-1887-468d-942c-999eb50ce95e" class=""><strong>Nmap Switches</strong></p><p id="86b8ef46-a872-4786-bb2d-3d8e060a6b32" class="">Nmap offers various command-line switches to customize scans. Key switches include:</p><ul id="00ae912b-63ec-4edc-b577-0636f26716f0" class="bulleted-list"><li style="list-style-type:disc"><code>-sS</code> for SYN scans (stealthy)</li></ul><ul id="15677401-7379-47bc-b120-c579e9e8c647" class="bulleted-list"><li style="list-style-type:disc"><code>sT</code> for TCP connect scans (full handshake)</li></ul><ul id="9c5966d4-8a5a-4f06-af3e-39f80aa2b989" class="bulleted-list"><li style="list-style-type:disc"><code>sU</code> for UDP scans</li></ul><ul id="ceece7dc-4aaf-4ddc-ba85-316a11c67049" class="bulleted-list"><li style="list-style-type:disc"><code>-p</code> to specify port ranges</li></ul><ul id="0a6614e3-e71f-46e0-aa1d-a67a09df795b" class="bulleted-list"><li style="list-style-type:disc"><code>-p-</code> scan all ports</li></ul><ul id="49dd146b-e02d-4cd8-aa0c-8e4090b40519" class="bulleted-list"><li style="list-style-type:disc"><code>-O</code> for OS detection</li></ul><ul id="2511b70b-fa73-4bb8-9846-1b8d9d9db69b" class="bulleted-list"><li style="list-style-type:disc"><code>Pn</code> to skip host discovery and scan all hosts directly</li></ul><p id="44c50313-8df3-435c-9e8b-009cd9d67ba1" class="">These switches allow you to adjust how Nmap interacts with the network.</p><p id="a43d7b5d-9a0d-4b7b-a0b6-47c8ac221c21" class="">
+</p><p id="045e1c85-288c-48ec-8b8a-08a10d659ff4" class=""><strong>Scan Types Overview</strong></p><p id="c87cc18e-e0d7-4e17-9cff-495452ce46d1" class="">Nmap supports different scan types for various purposes, such as probing protocols, discovering open services, or identifying vulnerabilities. Each scan type serves a specific role in network and security assessments.</p><p id="7cac508d-91b6-4b7c-89a3-1df5347e5b8c" class="">
+</p><p id="faf86b04-8ef3-4c01-9e28-a07f7d51a636" class=""><strong>TCP Connect Scans (Full TCP)</strong></p><p id="e241d57d-9bcf-42da-989e-99cf77de677f" class="">TCP Connect (<code>-sT</code>) is a complete handshake scan where Nmap establishes full TCP connections with target ports. It’s reliable but generates more logs since it fully opens and closes connections, making it easy to detect.</p><p id="d7c090e7-1370-41b8-be5b-bcf347d29755" class="">
+</p><p id="e52e0ee2-982f-46ff-815e-f64c82328029" class=""><strong>SYN Scans (Half-Open)</strong></p><p id="9fe93094-4ab3-4e77-956d-f34aabd8ec5c" class="">SYN scans (<code>-sS</code>) are faster and stealthier. They send SYN packets and wait for SYN-ACKs, identifying open ports without completing the TCP handshake. This makes SYN scans harder to detect by firewalls and intrusion detection systems (IDS).</p><p id="9a9ff879-9c8f-4eba-8d73-2375762d25f1" class="">
+</p><p id="eabe7f56-4735-4716-94ca-485e41f102ab" class=""><strong>UDP Scans</strong></p><p id="4b8b5745-1ee7-4343-b08a-f3cbde357941" class="">UDP scans (<code>-sU</code>) identify open UDP ports by sending UDP packets and waiting for responses. Since many services don’t reply to probes, open ports may require multiple retries, making UDP scanning slower than TCP scans. This method is essential for services like DNS and SNMP.</p><p id="8cb1607b-e55e-48b8-993c-a0b864ff80cc" class="">
+</p><p id="24695e51-1f70-4f51-8f4c-82f5ccd47428" class=""><strong>NULL, FIN, and Xmas Scans</strong></p><p id="59d9cb3e-3e0e-4942-a4ce-eb57b436e9ae" class="">These scans send unusual TCP flag combinations to potentially bypass firewalls:</p><ul id="41cfe57f-4f34-4717-891c-d183b02a0aeb" class="bulleted-list"><li style="list-style-type:disc"><strong>NULL</strong> (<code>sN</code>) sends packets with no flags set.</li></ul><ul id="15cc8d20-b43f-4961-bd76-790bd2151d87" class="bulleted-list"><li style="list-style-type:disc"><strong>FIN</strong> (<code>sF</code>) sends a FIN flag to indicate the end of a connection.</li></ul><ul id="47db47f0-2e9b-41fa-b21e-810eb0d8c74e" class="bulleted-list"><li style="list-style-type:disc"><strong>Xmas</strong> (<code>sX</code>) sets multiple flags to create an odd packet.</li></ul><p id="86367dc3-4ed9-4664-8a7a-48a4c79b37bd" class="">Closed ports usually respond with RST, while open ones don’t reply, helping to identify unfiltered ports.</p><p id="5376a9ed-538d-454a-ae02-92ee2e2dddac" class="">
+</p><p id="eba8afa8-bf46-48c3-a1e0-64ce1a3f05e2" class=""><strong>ICMP Network Scanning</strong></p><p id="19e00087-59ee-4bca-9926-ea9ea518e711" class="">Nmap sends an ICMP packet to each possible IP address for the specified network. When it receives a response, it marks the IP address that responded as being alive. To perform a ping sweep, we use the <code><strong>-sn</strong></code> switch in conjunction with IP ranges which can be specified with either a hypen (<code><strong>-</strong></code>) or CIDR notation.</p><p id="852afd14-0c3e-48b7-949c-69ba67d1a34a" class=""><code><strong>nmap -sn 192.168.0.1-254</strong></code></p><p id="3a6e1696-1d3f-44a2-935f-c38a584142e7" class="">
+</p><p id="77ee8e6e-467b-427e-a8fc-ae1f3d1c1b95" class=""><strong>NSE Scripts Overview</strong></p><p id="b3cfa837-3b43-4f4c-b537-33c3fdc925d2" class="">Nmap’s Scripting Engine (NSE) enhances Nmap by running Lua scripts for specialized tasks. These scripts can discover vulnerabilities, brute-force credentials, and retrieve additional network information.</p><p id="6ecdb230-b5cd-40dc-8805-178983130261" class="">
+</p><p id="fcee654c-0d66-4f77-a70f-8a30e7afc71d" class=""><strong>Working with NSE</strong></p><p id="4f349904-903f-44c9-b82b-302e6ae8f6a5" class="">NSE scripts can be run using the <code>--script</code> option, specifying either individual scripts or categories (e.g., <code>--script vuln</code> for vulnerability scanning). Multiple scripts can be executed simultaneously for in-depth network analysis.</p><p id="9f2a36a3-52d6-4f2e-b874-c48402b10c56" class="">
+</p><p id="6518ef7c-96c9-4ba3-a389-bbeb55102043" class=""><strong>Searching for NSE Scripts</strong></p><p id="604e1b51-c3ed-47c8-bb86-1f65cb10e57d" class="">NSE scripts are stored in the <code>/scripts/</code> directory, and you can search for them by category or function using the <code>--script-help</code> command. This helps users find relevant scripts for specific tasks, such as auditing, discovery, or vulnerability detection.</p><p id="34c16706-5c8a-4fed-b310-9e8c709b4ea5" class="">
+</p><p id="146d401b-b701-4a42-8ac8-ce8c7386a2c5" class=""><strong>Firewall Evasion</strong></p><p id="a2d947c8-3371-45ca-bde3-c8cd0d8a605b" class="">Nmap offers several options to bypass firewalls and intrusion detection systems (IDS):</p><ul id="1ad62895-a2f4-4b84-b54a-a423ac2b091c" class="bulleted-list"><li style="list-style-type:disc"><strong>Fragmentation</strong> (<code>f</code>) sends small packet fragments to evade detection.</li></ul><ul id="45633796-2500-491a-a6a2-b94b5a3a59f7" class="bulleted-list"><li style="list-style-type:disc"><code><strong>--scan-delay &lt;time&gt;ms</strong></code>:- used to add a delay between packets sent.</li></ul><ul id="657234b1-fc31-4659-91ca-1ce0c155b165" class="bulleted-list"><li style="list-style-type:disc"><strong>Decoy scans</strong> (<code>D</code>) spoof multiple IP addresses to obscure the true source.</li></ul><ul id="a8c5ec1b-943f-4b71-927b-3c99ec10bb22" class="bulleted-list"><li style="list-style-type:disc"><code><strong>--badsum</strong></code>:- this is used to generate in invalid checksum for packets. Any real TCP/IP stack would drop this packet, however, firewalls may potentially respond automatically, without bothering to check the checksum of the packe</li></ul><ul id="e4382f22-8657-44f0-b2d2-994277c697a6" class="bulleted-list"><li style="list-style-type:disc"><strong>Source port manipulation</strong> (<code>-source-port</code>) can bypass filters by sending packets from common ports like 80 (HTTP).</li></ul><ul id="d113d755-34b6-494e-bcf5-28cef1bfe96d" class="bulleted-list"><li style="list-style-type:disc"><strong>Timing adjustments</strong> (<code>T0</code> to <code>T5</code>) control the speed of scans to reduce the chance of detection.</li></ul></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
