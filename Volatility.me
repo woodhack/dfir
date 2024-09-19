@@ -1,0 +1,99 @@
+### Basic Analysis Commands
+
+1. **`windows.info`**
+    - **Description**: This plugin provides basic information about the memory image, such as the profile, image date and time, and the suggested KDBG (Kernel Debugger Data Block) address.
+    - **Output**: General information about the memory dump, which helps in confirming the OS version and configuration details.
+    
+    ```bash
+    vol -f memorydump.raw windows.info > info.txt
+    
+    ```
+    
+2. **`windows.pslist`**
+    - **Description**: This plugin lists all the active processes found in the memory image.
+    - **Output**: A list of running processes, including details like process IDs (PIDs), parent process IDs (PPIDs), creation times, and executable names.
+    
+    ```bash
+    vol -f memorydump.raw windows.pslist > pslist.txt
+    
+    ```
+    
+3. **`windows.netscan`**
+    - **Description**: This plugin scans for network connections and sockets.
+    - **Output**: Details of active network connections, including protocol, local and remote IP addresses, port numbers, and connection states.
+    
+    ```bash
+    vol -f memorydump.raw windows.netscan > netscan.txt
+    
+    ```
+    
+4. **`windows.dumpfiles`**
+    - **Description**: This plugin extracts files from memory, useful for analyzing process executable files or other memory-resident files.
+    - **Output**: The specified files are dumped into a directory for further analysis. This command requires a specific PID to dump files from a particular process.
+    
+    ```bash
+    vol -f memorydump.raw windows.dumpfiles --pid 1234 --dump-dir ./dumps/ > dumpfiles.txt
+    
+    ```
+    
+5. **`strings`**
+    - **Description**: This command isn't a Volatility plugin but a standard utility to extract printable strings from the memory dump.
+    - **Output**: A list of all printable strings found in the memory dump, which can include text from open documents, network connections, or other data.
+    
+    ```bash
+    strings memorydump.raw > strings_output.txt
+    
+    ```
+    
+6. **`windows.dlllist`**
+    - **Description**: This plugin lists all loaded DLLs for each process.
+    - **Output**: Information about loaded DLLs, including their base addresses, sizes, and paths. This is useful for understanding the modules each process is using.
+    
+    ```bash
+    vol -f memorydump.raw windows.dlllist > dlllist.txt
+    
+    ```
+    
+
+### Advanced Analysis Commands
+
+1. **`windows.registry.hivelist`**
+    - **Description**: This plugin lists the registry hives found in the memory image.
+    - **Output**: Details of registry hives, including their base addresses and paths. This is essential for registry analysis and extracting specific registry keys and values.
+    
+    ```bash
+    vol -f memorydump.raw windows.registry.hivelist > hivelist.txt
+    
+    ```
+    
+2. **`windows.filescan`**
+    - **Description**: This plugin scans for file objects in memory.
+    - **Output**: A list of file objects, including details about the files that were open when the memory was captured. This can help identify files that were in use or accessed during the time of the snapshot.
+    
+    ```bash
+    vol -f memorydump.raw windows.filescan > filescan.txt
+    
+    ```
+    
+3. **`windows.vadinfo`**
+    - **Description**: This plugin provides information about the Virtual Address Descriptors (VAD) of a process.
+    - **Output**: Detailed information about the memory regions allocated by each process, including start and end addresses, protection flags, and types of memory regions.
+    
+    ```bash
+    vol -f memorydump.raw windows.vadinfo > vadinfo.txt
+    
+    ```
+    
+
+### Explanation of Outputs
+
+- **`info.txt`**: Basic information about the memory image, helping to verify the OS and system details.
+- **`pslist.txt`**: A list of active processes, crucial for identifying running applications and potential malware.
+- **`netscan.txt`**: Details of network connections, useful for identifying suspicious network activity and connections.
+- **`dumpfiles.txt`**: Information about files dumped from a specific process, useful for examining executable files or memory-resident data.
+- **`strings_output.txt`**: All printable strings from the memory dump, which can contain useful information such as commands, URLs, passwords, and other data.
+- **`dlllist.txt`**: Information about DLLs loaded by each process, helping to identify potentially malicious modules.
+- **`hivelist.txt`**: Details of registry hives, essential for further registry analysis.
+- **`filescan.txt`**: A list of file objects found in memory, useful for identifying files that were accessed or in use.
+- **`vadinfo.txt`**: Information about memory regions allocated by processes, providing insights into how memory is used and potentially identifying malicious activity.
+
