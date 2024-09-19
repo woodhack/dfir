@@ -1,0 +1,143 @@
+# Forensics
+
+## OS
+
+To retrieve information about the operating system release, the cat utility can be used to read the file located at /etc/os-release, which contains details about the system's version and distribution.
+
+`cat /etc/os-release`
+
+## Users
+
+The /etc/passwd file holds essential information about user accounts on a Linux system. It is a plain-text file that contains 7 colon-separated fields: username, password placeholder, user ID (UID), group ID (GID), user description (often full name), the home directory, and the shell that is invoked at login. The cat utility can be used to display this information in a more readable format.
+
+`cat /etc/passwd | column -t -s :`
+
+## Groups
+
+The /etc/group file contains details about the various user groups on the system. Each group has its name, group password (usually not set), GID, and a list of users who belong to the group. This file can be read using:
+
+`cat /etc/group`
+
+## Sudoers list - Privileges for sudo
+
+To determine which users have the ability to elevate privileges via sudo, you can inspect the /etc/sudoers file. This file defines the users and groups allowed to perform administrative tasks with sudo. Accessing it requires elevated privileges:
+
+`sudo cat /etc/sudoers`
+
+## Login Info
+
+Login records are stored in the /var/log directory. wtmp contains a history of logins and reboots, while btmp logs failed login attempts. These binary files can be read using the last utility to view login attempts.
+
+`sudo last -f /var/log/wtmp`
+
+## Authentication Logs
+
+User authentication events are logged in the /var/log/auth.log file, which logs successful and failed authentication attempts, as well as sudo usage.
+
+`cat /var/log/auth.log | tail`
+
+## Hostname
+
+The system hostname, which identifies the machine on the network, is stored in the /etc/hostname file.
+
+`cat /etc/hostname`
+
+## Timezone
+
+The system's timezone configuration is stored in the /etc/timezone file. It can be read to determine the current timezone settings of the system.
+
+`cat /etc/timezone`
+
+## Network Configuration
+
+Network interfaces and configurations are defined in /etc/network/interfaces. This file can provide insight into the system’s network setup, including IP addresses, DNS servers, and routes.
+
+`cat /etc/network/interfaces`
+
+For live network information, the ip command provides details on the system’s network interfaces and IP addresses.
+
+`ip address show`
+
+## Active Network Connections
+
+Monitoring active network connections is vital in live forensics. The netstat utility displays active network connections, listening ports, and the corresponding processes.
+
+`netstat -natp`
+
+## Running Processes
+
+On a live system, it is critical to examine the running processes to understand what is actively occurring on the machine. The ps utility provides details on running processes, including their owner, CPU usage, and command used to launch them.
+
+`ps aux`
+
+## DNS Information
+
+The /etc/hosts file maps hostnames to IP addresses locally on the machine. This file can be examined for static DNS configurations.
+
+`cat /etc/hosts`
+
+Information about DNS servers used by the system for name resolution is stored in /etc/resolv.conf.
+
+`cat /etc/resolv.conf`
+
+## Persistence
+
+### Cron Jobs
+
+Cron jobs are automated tasks that run at scheduled intervals. The system-wide cron jobs are defined in /etc/crontab, making it an important file to check for any persistent tasks that might have been set by an attacker.
+
+`cat /etc/crontab`
+
+### Service Startup
+
+Linux services that start automatically at boot are usually managed by scripts in the /etc/init.d directory. These services can persist across reboots, making them a potential target for attackers looking to maintain access.
+
+`ls /etc/init.d/`
+
+### .Bashrc
+
+The .bashrc file contains shell configuration commands that run whenever a new terminal session is started. It can be a potential location for persistence mechanisms set by attackers.
+
+`cat ~/.bashrc`
+
+## Evidence of Execution
+
+### Sudo Execution History
+
+Commands executed using sudo are logged in the authentication log file. This can provide a detailed history of administrative commands run on the system.
+
+`cat /var/log/auth.log* | grep -i COMMAND | tail`
+
+### Bash History
+
+Each user’s command history is stored in their ~/.bash_history file, which logs commands that are run outside of sudo. It is essential to check all users' .bash_history files, including root.
+
+`cat ~/.bash_history` 
+
+`sudo cat /home/{USERNAME}/.bash_history`
+
+### Files Accessed Using Vim
+
+The Vim text editor logs opened files in .viminfo. This file contains a record of files that have been opened and manipulated, as well as search history and other command information, providing potential evidence of file access.
+
+`cat ~/.viminfo`
+
+## Logs
+
+### Syslog
+
+The syslog is a critical system log that captures general messages and errors generated by the kernel and other system components. It can be a valuable source of information for understanding system activity and potential issues.
+
+`cat /var/log/syslog* | head`
+
+### Auth Logs
+
+Authentication logs contain information related to user logins, sudo access, and other security-related events. It is essential for tracking suspicious authentication attempts.
+
+`cat /var/log/auth.log* | head`
+
+### Third-Party Logs
+
+Logs for third-party applications, such as web servers, databases, and file-sharing services, are typically stored in /var/log/. Checking these directories can reveal activity from non-native software.
+
+`ls /var/log ls /var/log/apache2/`
