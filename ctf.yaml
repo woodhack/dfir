@@ -1,0 +1,413 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  This file will create the following services:
+    - 3 EC2 instances (Production, Dev, Staging)
+    - 3 S3 buckets (public files, internal docs, CloudTrail logs)
+    - S3 access logs for internal docs
+    - 9 IAM users (groups & policies)
+    - CloudTrail (multi-region)
+    - VPC Flow Logs to CloudWatch + S3
+    - Athena WorkGroup
+
+Resources:
+
+  # 1) VPC + Subnet + IGW
+
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: CTF-VPC
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: CTF-IGW
+
+  IGWAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref MyVPC
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      AvailabilityZone: !Select [0, !GetAZs '']
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: CTF-Public-Subnet
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MyVPC
+      Tags:
+        - Key: Name
+          Value: CTF-Public-RT
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: IGWAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+
+  # 2) Security Group
+
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref MyVPC
+      GroupDescription: Allow inbound SSH, all outbound
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
+
+  # 3) S3 Buckets
+
+  PublicFilesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "public-files"
+      AccessControl: PublicRead
+      Tags:
+        - Key: Name
+          Value: PublicFilesBucket
+
+  InternalDocsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "internal-docs"
+      LoggingConfiguration:
+        # S3 Server Access Logs will go to the CloudTrailLogsBucket
+        DestinationBucketName: !GetAtt CloudTrailLogsBucket.DomainName
+        LogFilePrefix: "internal-docs-access/"
+      Tags:
+        - Key: Name
+          Value: InternalDocsBucket
+
+  CloudTrailLogsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "cloudtrail-logs"
+      VersioningConfiguration:
+        Status: Enabled
+      Tags:
+        - Key: Name
+          Value: CloudTrailLogsBucket
+
+  # Bucket policy to allow S3 (the internal docs bucket) and CloudTrail to write logs
+  CloudTrailLogsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref CloudTrailLogsBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowInternalDocsBucketToWriteLogs
+            Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub "${CloudTrailLogsBucket.Arn}/internal-docs-access/*"
+            Condition:
+              StringEquals:
+                aws:SourceBucket: !Ref InternalDocsBucket
+          - Sid: AllowCloudTrailToWrite
+            Effect: Allow
+            Principal:
+              Service: cloudtrail.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub "${CloudTrailLogsBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Sub "${AWS::AccountId}"
+
+
+  # 4) CloudTrail
+
+  MyCloudTrail:
+    Type: AWS::CloudTrail::Trail
+    Properties:
+      TrailName: "MyGlobalTrail"
+      S3BucketName: !Ref CloudTrailLogsBucket
+      IsMultiRegionTrail: true
+      IncludeGlobalServiceEvents: true
+      EnableLogFileValidation: true
+      IsLogging: true
+
+
+  # 5a) VPC Flow Logs to CloudWatch
+  
+  FlowLogsLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/vpc/flowlogs-${MyVPC}"
+
+  FlowLogsIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: vpc-flow-logs.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+
+  MyVPCFlowLogCW:
+    Type: AWS::EC2::FlowLog
+    Properties:
+      DeliverLogsPermissionArn: !GetAtt FlowLogsIAMRole.Arn
+      LogGroupName: !Ref FlowLogsLogGroup
+      ResourceId: !Ref MyVPC
+      ResourceType: VPC
+      TrafficType: ALL
+
+
+  # 5b) VPC Flow Logs to S3
+
+  FlowLogsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "vpc-flow-logs-${AWS::AccountId}-${AWS::Region}"
+      Tags:
+        - Key: Name
+          Value: VPCFlowLogsBucket
+
+  FlowLogsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FlowLogsBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: VPCFlowLogsWrite
+            Effect: Allow
+            Principal:
+              Service: vpc-flow-logs.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub "${FlowLogsBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+
+  MyVPCFlowLogS3:
+    Type: AWS::EC2::FlowLog
+    Properties:
+      ResourceId: !Ref MyVPC
+      ResourceType: VPC
+      TrafficType: ALL
+      LogDestinationType: s3
+      LogDestination: !GetAtt FlowLogsBucket.Arn
+      # You can optionally specify a custom prefix with LogFormat or deliver to a subfolder, e.g.:
+      # LogFormat: '${version} ${account-id} ${interface-id} ...'
+      # MaxAggregationInterval: 600
+
+
+  # 6) Athena WorkGroup
+
+  MyAthenaWorkGroup:
+    Type: AWS::Athena::WorkGroup
+    Properties:
+      Name: "CTFAthenaWorkGroup"
+      Description: "WorkGroup for queries in the CTF environment"
+      State: ENABLED
+      WorkGroupConfiguration:
+        EnforceWorkGroupConfiguration: false
+        PublishCloudWatchMetricsEnabled: false
+        RequesterPaysEnabled: false
+        ResultConfiguration:
+          OutputLocation: !Sub "s3://${CloudTrailLogsBucket}/athena-results/"
+
+
+  # 7) EC2 Instances - Created without key-paif for ctf
+
+  ProductionEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0c55b159cbfafe1f0  # Amazon Linux 2 in us-east-1
+      SubnetId: !Ref PublicSubnet
+      SecurityGroupIds:
+        - !Ref MySecurityGroup
+      Tags:
+        - Key: Name
+          Value: Production-Instance
+
+  DevelopmentEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0c55b159cbfafe1f0
+      SubnetId: !Ref PublicSubnet
+      SecurityGroupIds:
+        - !Ref MySecurityGroup
+      Tags:
+        - Key: Name
+          Value: Development-Instance
+
+  StagingEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0c55b159cbfafe1f0
+      SubnetId: !Ref PublicSubnet
+      SecurityGroupIds:
+        - !Ref MySecurityGroup
+      Tags:
+        - Key: Name
+          Value: Staging-Instance
+
+  ##########################
+  # 8) 9 IAM Users, Groups, Policies
+  ##########################
+  AdminGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: "CTF-AdminGroup"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
+  DevGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: "CTF-DevGroup"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/PowerUserAccess
+
+  ReadOnlyGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: "CTF-ReadOnlyGroup"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+
+  # Admin users
+  AdminUser1:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: "AdminUser1"
+      Groups:
+        - !Ref AdminGroup
+
+  AdminUser2:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: "AdminUser2"
+      Groups:
+        - !Ref AdminGroup
+
+  AdminUser3:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: "AdminUser3"
+      Groups:
+        - !Ref AdminGroup
+
+  # Dev users
+  DevUser4:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: "DevUser4"
+      Groups:
+        - !Ref DevGroup
+
+  DevUser5:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: "DevUser5"
+      Groups:
+        - !Ref DevGroup
+
+  DevUser6:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: "DevUser6"
+      Groups:
+        - !Ref DevGroup
+
+  # ReadOnly users
+  ReadOnlyUser7:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: "ReadOnlyUser7"
+      Groups:
+        - !Ref ReadOnlyGroup
+
+  ReadOnlyUser8:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: "ReadOnlyUser8"
+      Groups:
+        - !Ref ReadOnlyGroup
+
+  ReadOnlyUser9:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: "ReadOnlyUser9"
+      Groups:
+        - !Ref ReadOnlyGroup
+
+Outputs:
+  PublicFilesBucketName:
+    Description: "Public S3 bucket name"
+    Value: !Ref PublicFilesBucket
+
+  InternalDocsBucketName:
+    Description: "Internal docs S3 bucket name"
+    Value: !Ref InternalDocsBucket
+
+  CloudTrailLogsBucketName:
+    Description: "CloudTrail logs S3 bucket name"
+    Value: !Ref CloudTrailLogsBucket
+
+  FlowLogsBucketName:
+    Description: "VPC Flow Logs S3 bucket name"
+    Value: !Ref FlowLogsBucket
+
+  ProductionEC2Id:
+    Description: "Production EC2 Instance ID"
+    Value: !Ref ProductionEC2
+
+  DevelopmentEC2Id:
+    Description: "Development EC2 Instance ID"
+    Value: !Ref DevelopmentEC2
+
+  StagingEC2Id:
+    Description: "Staging EC2 Instance ID"
+    Value: !Ref StagingEC2
+
+  AthenaWorkGroupName:
+    Description: "Athena WorkGroup"
+    Value: !Ref MyAthenaWorkGroup
+
+  VPCId:
+    Description: "VPC ID"
+    Value: !Ref MyVPC
